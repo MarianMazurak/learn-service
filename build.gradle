@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
 group 'org.example'
@@ -10,10 +11,29 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
+    implementation 'io.dropwizard:dropwizard-core:2.1.12'
+
 }
 
 test {
     useJUnitPlatform()
+}
+task hello (dependsOn: ['clean', 'build']) {
+    doLast {
+        println 'Hello from custom Gradle task!'
+    }
+}
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'org.example.LearnApplication'
+        )
+    }
+}
+
+shadowJar {
+    archiveBaseName = 'learn-service'
+    archiveVersion = ''
+    archiveClassifier = ''
 }
