@@ -1,20 +1,22 @@
 package org.example.resource;
 
 import com.codahale.metrics.annotation.Timed;
+import org.example.entity.TestEntity;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 @Path("/hello")
-@Produces(MediaType.TEXT_PLAIN)
+@Produces(MediaType.APPLICATION_JSON)
 public class HelloResource {
 
-    private String subject;
+    private TestEntity testEntity;
 
-    public HelloResource(String subject) {
-        this.subject = subject;
+    public HelloResource(TestEntity testEntity) {
+        this.testEntity = testEntity;
     }
 
     // example for non-stateless resource class
@@ -23,11 +25,7 @@ public class HelloResource {
 
     @GET
     @Timed
-    public String sayHello() {
-        int sum = staticInt + number;
-        number++;
-        staticInt++;
-        System.out.println("hello");
-        return subject;
+    public List<String> sayHello() {
+        return testEntity.getRowFromTest();
     }
 }

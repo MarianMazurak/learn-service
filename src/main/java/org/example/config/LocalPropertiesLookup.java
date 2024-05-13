@@ -1,4 +1,4 @@
-package org.example.resource.config;
+package org.example.config;
 
 import org.apache.commons.text.lookup.StringLookup;
 
@@ -8,7 +8,7 @@ import java.util.Properties;
 
 public class LocalPropertiesLookup implements StringLookup {
 
-    private static Properties properties = loadProperties("local.properties");
+    private static Properties properties = loadProperties("C:\\dev\\learn-service\\local.properties");
 
     private static Properties loadProperties(String propertiesFileName) {
         Properties properties = new Properties();

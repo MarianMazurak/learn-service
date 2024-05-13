@@ -2,36 +2,39 @@ package org.example;
 
 
 import io.dropwizard.Application;
-import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
+import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
-import org.apache.commons.text.StringSubstitutor;
+import org.example.cli.DatabaseAppliers;
+import org.example.entity.TestEntity;
 import org.example.resource.HealthCheckResource;
 import org.example.resource.HelloResource;
-import org.example.resource.config.LocalPropertiesLookup;
-import org.example.resource.config.LocalPropertiesSubstitutor;
+import org.example.config.LocalPropertiesSubstitutor;
+import org.jdbi.v3.core.Jdbi;
 
 public class LearnApplication extends Application<LearnConfiguration> {
 
     public static void main(String[] args) throws Exception {
-        new LearnApplication().run("server", "config.yml");
-        if (args.length != 0) {
-
-            System.out.println(args[0]);
+        for (int i=0; args.length > i; i++)
+        {
+            System.out.println(args[i]);
         }
+        new LearnApplication().run(args);
     }
 
     @Override
-    public void run(LearnConfiguration configuration, Environment environment) throws Exception {
-
-        HelloResource helloResource = new HelloResource(configuration.getNameOfSubject());
+    public void run(LearnConfiguration configuration, Environment environment) {
         HealthCheckResource healthCheckResource = new HealthCheckResource();
-        System.out.println(configuration.getLearningDuration());
-        System.out.println(configuration.getUrlGetRandomNumbers());
-        System.out.println(configuration.getNameOfSubject());
 
+        //Db initializing
+        final JdbiFactory factory = new JdbiFactory();
+        final Jdbi jdbi = factory.build(environment, configuration.getDataSourceFactory(), "postgresql");
+        TestEntity testEntity = new TestEntity(jdbi);
+
+
+        HelloResource helloResource = new HelloResource(testEntity);
         environment.jersey().register(helloResource);
         environment.healthChecks().register("health", healthCheckResource);
     }
@@ -48,6 +51,9 @@ public class LearnApplication extends Application<LearnConfiguration> {
                 new SubstitutingSourceProvider(
                         bootstrap.getConfigurationSourceProvider(),
                         new LocalPropertiesSubstitutor()));
+
+        //CLI create database and tables
+        bootstrap.addCommand(new DatabaseAppliers());
     }
 
 }
